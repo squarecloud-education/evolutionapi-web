@@ -65,6 +65,7 @@
     }
   },
   "dependencies": {
+    "rollup": "4.34.8",
     "@adiwajshing/keyed-db": "^0.2.4",
     "@aws-sdk/client-sqs": "^3.891.0",
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
@@ -137,6 +138,9 @@
     "tsx": "^4.20.5",
     "typescript": "^5.7.2",
     "undici": "^7.16.0",
+    "uuid": "^13.0.0"
+  },
+  "devDependencies": {
     "eslint": "^8.45.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.31.0",
@@ -144,9 +148,6 @@
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "@typescript-eslint/eslint-plugin": "^8.44.0",
     "@typescript-eslint/parser": "^8.44.0",
-    "uuid": "^13.0.0"
-  },
-  "devDependencies": {
     "commitizen": "^4.3.1",
     "@commitlint/cli": "^19.8.1",
     "cz-conventional-changelog": "^3.3.0",
