@@ -9,7 +9,7 @@
 
 ### 📦 Quick Setup
 
-1. **Download**: Get the latest `.zip` file from the [releases page](/releases).
+1. **Download**: Get the latest `.zip` file from the [releases page](https://github.com/squarecloud-education/evolutionapi-web/releases).
 2. **Configure**: Set the needed environment variables in your `.env` file and sets database with `npm run db:deploy`.
 3. **Upload**: Send the `.zip` file to Square Cloud.
 4. **Wait**: Allow ~2 minutes for initial installation.
