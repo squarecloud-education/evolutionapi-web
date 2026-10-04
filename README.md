@@ -7,21 +7,63 @@
 
 ## 🚀 How to host this project on Square Cloud
 
-### 📦 Quick Setup
+New to Square Cloud? Follow these steps in order. Evolution API needs a PostgreSQL database, so besides the upload you will create the database and prepare the project on your computer.
 
-1. **Download**: Get the latest `.zip` file from the [releases page](https://github.com/squarecloud-education/evolutionapi-web/releases).
-2. **Configure**: Set the needed environment variables in your `.env` file and sets database with `npm run db:deploy`.
-3. **Upload**: Send the `.zip` file to Square Cloud.
-4. **Wait**: Allow ~2 minutes for initial installation.
-5. **Access**: Open the web link and see if it started correctly.
+### 1️⃣ Create your Square Cloud account
 
-### 📝 Recommended Requirements
+Sign up on the [Square Cloud signup page](https://squarecloud.app/en/signup) with your email.
 
-For the best experience, it is recommended to use:
+### 2️⃣ Choose a plan
 
-- **3072MB RAM**
+Hosting on Square Cloud requires an active plan, and both the database and the upload ask for one, so choose it now.
 
-You can run this project even on the most basic plan, such as the **Standard Tier 1** plan on Square Cloud.
+Evolution API needs **3 GB of RAM** and a PostgreSQL database: choose the **[Standard plan](https://squarecloud.app/en/pricing)**, which has 4 GB of RAM, 4 vCPU and includes managed databases. Compare every plan and its price on the [pricing page](https://squarecloud.app/en/pricing).
+
+### 3️⃣ Create the PostgreSQL database
+
+1. Create a PostgreSQL database in the [Square Cloud dashboard](https://squarecloud.app/en/dashboard) (see [how to create a managed database](https://docs.squarecloud.app/en/tutorials/how-to-deploy-your-database)).
+2. On the database page, copy the connection URL and download the certificate files (`.crt` and `.key`).
+3. Evolution API reads the certificate as a `.p12` file. Convert it with [OpenSSL](https://www.openssl.org/) and choose an export password:
+   ```bash
+   openssl pkcs12 -export -out client-identity.p12 -inkey <certificate>.key -in <certificate>.crt
+   ```
+
+### 4️⃣ Download and configure the project
+
+1. Download **`project.zip`** from the [latest release](https://github.com/squarecloud-education/evolutionapi-web/releases/latest) and extract it.
+2. Put the `client-identity.p12` file in the extracted folder.
+3. Open the `.env` file and set:
+   - `DATABASE_CONNECTION_URI`: your database URL, ending with `?sslmode=require&sslidentity=client-identity.p12&sslpassword=<export password>`
+   - `SERVER_URL`: `https://<subdomain>.squareweb.app`, with the subdomain you will use in step 6, for example `https://my-evolution-api.squareweb.app`
+   - `AUTHENTICATION_API_KEY`: a long random value only you know. The one in the file is public, so always replace it.
+
+### 5️⃣ Create the database tables
+
+Install [Node.js 24](https://nodejs.org/) on your computer. Then, in the extracted folder, run:
+
+```bash
+npm install
+npm run db:deploy        # on Windows: npm run db:deploy:win
+```
+
+### 6️⃣ Upload it to Square Cloud
+
+1. Delete the `node_modules` folder that `npm install` created: Square Cloud installs the dependencies itself.
+2. Select **all files inside the folder** (including `.env`, `.p12` and the hidden `.squarecloud` folder) and compress them into a new `.zip`. Compress the files, not the folder itself: `squarecloud.app` must be at the root of the zip.
+3. Open the [Square Cloud upload page](https://squarecloud.app/en/dashboard/new).
+4. Select the **zip** option and send your zip.
+5. Select **Web Publication** and use the same subdomain as your `SERVER_URL`, for example `my-evolution-api`.
+6. Click **Deploy** and wait a few minutes: the first start builds the project.
+
+![Uploading a project to Square Cloud](https://cdn.squarecloud.app/docs/articles/dashboard/uploading.gif)
+
+### 7️⃣ Open the manager
+
+Open `https://my-evolution-api.squareweb.app/manager`, enter your `SERVER_URL` and `AUTHENTICATION_API_KEY`, and create your first WhatsApp instance.
+
+📖 Need more details, like the optional Redis cache? Read the [full Evolution API guide](https://docs.squarecloud.app/en/tutorials/how-to-deploy-evolution-api) in the Square Cloud documentation.
+
+> ⚠️ **Updating from an older release?** Evolution API 2.3.7 adds a database migration: run step 5 against your database again before uploading the new version.
 
 ---
 

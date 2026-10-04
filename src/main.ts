@@ -1,6 +1,9 @@
 import dotenv from 'dotenv';
 dotenv.config({ path: '.env' });
+// Import this first from sentry instrument!
 import '@utils/instrumentSentry';
+
+// Now import other modules
 import { ProviderFiles } from '@api/provider/sessions';
 import { PrismaRepository } from '@api/repository/repository.service';
 import { HttpStatus, router } from '@api/routes/index.router';
@@ -24,9 +27,11 @@ import compression from 'compression';
 import cors from 'cors';
 import express, { json, NextFunction, Request, Response, urlencoded } from 'express';
 import { join } from 'path';
-function initWA() {
-  waMonitor.loadInstance();
+
+async function initWA() {
+  await waMonitor.loadInstance();
 }
+
 async function bootstrap() {
   const logger = new Logger('SERVER');
   const app = express();
@@ -129,9 +134,12 @@ async function bootstrap() {
       next();
     },
   );
+
   const httpServer = configService.get<HttpServer>('SERVER');
+
   ServerUP.app = app;
   let server = ServerUP[httpServer.TYPE];
+
   if (server === null) {
     logger.warn('SSL cert load failed — falling back to HTTP.');
     logger.info("Ensure 'SSL_CONF_PRIVKEY' and 'SSL_CONF_FULLCHAIN' env vars point to valid certificate files.");
@@ -139,14 +147,25 @@ async function bootstrap() {
     httpServer.TYPE = 'http';
     server = ServerUP[httpServer.TYPE];
   }
+
   eventManager.init(server);
+
   const sentryConfig = configService.get<SentryConfig>('SENTRY');
   if (sentryConfig.DSN) {
     logger.info('Sentry - ON');
+
+    // Add this after all routes,
+    // but before any and other error-handling middlewares are defined
     Sentry.setupExpressErrorHandler(app);
   }
+
   server.listen(httpServer.PORT, () => logger.log(httpServer.TYPE.toUpperCase() + ' - ON: ' + httpServer.PORT));
-  initWA();
+
+  initWA().catch((error) => {
+    logger.error('Error loading instances: ' + error);
+  });
+
   onUnexpectedError();
 }
+
 bootstrap();
